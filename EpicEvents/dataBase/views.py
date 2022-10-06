@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from .models import Event, Contract, Customer, CustomUser
 from .serializers import ContractSerializer, CustomerSerializer, EventSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import HasCustomerPermission, HasEventPermission, HasContractPermission
 
@@ -31,9 +32,9 @@ class UserRegistrationView(ModelViewSet):
 class Customers(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
-    permission_classes = [IsInSalesTeam | IsInSupportTeam | IsAdmin]
+    #authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-#[IsInSalesTeam | IsInSupportTeam | IsAdmin]
     def list(self, request, *args, **kwargs):
 
         instances = Customer.objects.all()

@@ -40,8 +40,8 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = [
-            'id', 'sales', 'first_name', 'last_name', 'email',
-            'mobile', 'company_name', 'date_creation', 'date_update'
+            'id', 'sales_contact', 'first_name', 'last_name', 'email',
+            'mobile', 'company_name', 'date_created', 'date_updated'
         ]
         extra_kwargs = {
             'id': {'read_only': True},
