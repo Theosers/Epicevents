@@ -54,18 +54,17 @@ class CustomerSerializer(serializers.ModelSerializer):
 class ContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contract
-        fields = ['id', 'customer', 'sales', 'value', 'status', 'time_created']
+        fields = ['id', 'customer', 'sales_contact', 'amount','payment_due','status', 'date_created']
         extra_kwargs = {
             'id': {'read_only': True},
-            'sales': {'read_only': True},
-            'time_created': {'read_only': True},
+            'sales_contact': {'read_only': True},
+            'date_created': {'read_only': True},
         }
-
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['id', 'contract', 'title', 'date', 'support', 'status', 'time_created']
+        fields = ['id', 'contract', 'event_date', 'support_contact', 'event_status','attendees','notes', 'date_created']
         extra_kwargs = {
             'id': {'read_only': True},
             'time_created': {'read_only': True}
