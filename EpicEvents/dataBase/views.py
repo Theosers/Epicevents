@@ -5,14 +5,17 @@ from django.shortcuts import get_object_or_404
 from .models import Event, Contract, Customer, CustomUser
 from .serializers import ContractSerializer, CustomerSerializer, EventSerializer, UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import HasCustomerPermission, HasEventPermission, HasContractPermission
-from .filters import CustomerFilter
+from .permissions import HasCustomerPermission, HasContractPermission
+from .filters import CustomerFilter, ContractFilter, EventFilter
 import django_filters
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from django.db.models import F
 class UserRegistrationView(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+
 
     def create(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
@@ -33,17 +36,21 @@ class Customers(ModelViewSet):
     queryset = Customer.objects.all()
     permission_classes = [IsAuthenticated]
 
-
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class  = CustomerFilter
+    search_fields = ['first_name', 'last_name', 'email']
 
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
 
+        return queryset
 
     def list(self, request, *args, **kwargs):
-        #Customer.objects.get(id=kwargs['id'])
 
-        instances = Customer.objects.all()
-        serializer = CustomerSerializer(instances, many=True)
+        queryset = self.filter_queryset(self.get_queryset())  # Filtrer le queryset
+        serializer = CustomerSerializer(queryset, many=True)  # Utiliser le queryset filtré
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -98,8 +105,15 @@ class Contracts(ModelViewSet):
     queryset = Contract.objects.all()
     permission_classes = [IsAuthenticated]
 
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = ContractFilter
+    search_fields = ['customer_first_name', 'customer_last_name', 'customer_email']
+
     def list(self, request, *args, **kwargs):
-        instances = Contract.objects.all()
+        instances = self.filter_queryset(self.get_queryset()).annotate(
+            customer_first_name=F('customer__first_name'),
+            customer_email=F('customer__email')
+        )
         serializer = ContractSerializer(instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -123,12 +137,6 @@ class Individual_Contract(ModelViewSet):
     serializer_class = ContractSerializer
     queryset = Contract.objects.all()
     permission_classes = [IsAuthenticated, HasContractPermission]
-
-    '''def retrieve(self, request, *args, **kwargs):
-        instance = Customer.objects.get(id=kwargs['id'])
-        serializer = CustomerSerializer(instance, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    '''
 
     def retrieve(self, request, *args, **kwargs):
         instance = Contract.objects.get(id=kwargs['id'])
@@ -160,8 +168,15 @@ class Events(ModelViewSet):
     queryset = Event.objects.all()
     permission_classes = [IsAuthenticated]
 
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = EventFilter
+    search_fields = ['contract__customer__first_name', 'contract__customer__last_name', 'contract__customer__email']
+
     def list(self, request, *args, **kwargs):
-        instances = Event.objects.all()
+        instances = self.filter_queryset(self.get_queryset()).annotate(
+            customer_first_name=F('contract__customer__first_name'),
+            customer_email=F('contract__customer__email')
+        )
         serializer = EventSerializer(instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

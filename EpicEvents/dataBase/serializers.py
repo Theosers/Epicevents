@@ -52,9 +52,12 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
 class ContractSerializer(serializers.ModelSerializer):
+    customer_first_name = serializers.CharField(source='customer.first_name', read_only=True)
+    customer_last_name = serializers.CharField(source='customer.last_name', read_only=True)
+
     class Meta:
         model = Contract
-        fields = ['id', 'customer', 'sales_contact', 'amount','payment_due','status', 'date_created']
+        fields = ['id', 'customer', 'customer_first_name', 'customer_last_name', 'sales_contact', 'amount', 'payment_due', 'status', 'date_created']
         extra_kwargs = {
             'id': {'read_only': True},
             'sales_contact': {'read_only': True},
@@ -62,9 +65,12 @@ class ContractSerializer(serializers.ModelSerializer):
         }
 
 class EventSerializer(serializers.ModelSerializer):
+    customer_first_name = serializers.CharField(source='contract.customer.first_name', read_only=True)
+    customer_last_name = serializers.CharField(source='contract.customer.last_name', read_only=True)
+
     class Meta:
         model = Event
-        fields = ['id', 'contract', 'event_date', 'support_contact', 'event_status','attendees','notes', 'date_created']
+        fields = ['id', 'contract', 'customer_first_name', 'customer_last_name', 'event_date', 'support_contact', 'event_status','attendees','notes', 'date_created']
         extra_kwargs = {
             'id': {'read_only': True},
             'time_created': {'read_only': True}

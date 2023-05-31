@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'dataBase',
     'rest_framework',
     'rest_framework_simplejwt',
-    'django_filters'
+    'django_filters',
 
 ]
 
@@ -81,8 +81,8 @@ WSGI_APPLICATION = 'EpicEvents.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'epicevents',
-        'USER' : 'theo',
+        'NAME': 'postgres',
+        'USER' : 'theophile',
         'PASSWORD' : '123456',
         'HOST' : 'localhost',
         'PORT' : '5432',
@@ -114,13 +114,13 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'rest_framework.permissions.AllowAny'
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
